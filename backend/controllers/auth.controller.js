@@ -19,10 +19,17 @@ export const register = async (req, res) => {
       password: hashedPassword,
     });
 
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
     res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -58,4 +65,8 @@ export const login = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
+};
+
+export const getMe = (req, res) => {
+  res.status(200).json(req.user);
 };
